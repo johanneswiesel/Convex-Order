@@ -1,14 +1,14 @@
-# Wasserstein correlation
+# Convex order via Wasserstein distance
 
-This repository contains the implementations of the numerical examples in the paper "Measuring association with Wasserstein distances", which can be found under arXiv:2102.00356.
+This repository contains the implementations of the numerical examples in the paper "A new characterisation of convex order through the 2-Wasserstein distance", which can be found under arXiv:....
 
 ## Prerequisites
 
-Python, NumPy, SciPy, Matplotlib, XiCor, OT, statsmodels. The programs were tested with Python 3.7.0.
+Python, NumPy, SciPy, Matplotlib, OT. The programs were tested with Python 3.7.0.
 
 ## Running the programs
 
-Each script contains the implementation of one figure.
+Running the jupyter notebook plots the figures. The python files are used for the implementation of the optimization procedure.
 
 # License
 
