@@ -1,3 +1,10 @@
+# Authors: Authors: Johannes Wiesel, Erica Zhang
+# License: MIT License
+# Version: June 30, 2022
+
+# DESCRIPTION: This package returns a list containing the histogram bins and the histogram height for an array of distributions, including customized. All histogram generating functions include a "plot" parameter that is set by default to be false. Users could turn it on to plot the histograms. 
+
+# import dependencies
 import numpy as np
 import matplotlib.pylab as pl
 from scipy import stats
@@ -5,13 +12,6 @@ from itertools import product
 import math
 from sklearn.utils import check_random_state, deprecated
 from partition_tools import *
-
-# Authors: Authors: Johannes Wiesel, Erica Zhang
-# License: MIT License
-# Version: June 30, 2022
-
-# DESCRIPTION: This package returns a list containing the histogram bins and the histogram height for an array of distributions, including customized. All histogram generating functions include a "plot" parameter that is set by default to be false. Users could turn it on to plot the histograms. 
-
 
 
 def gauss1D(n,m,s,plot = False):
