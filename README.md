@@ -1,6 +1,6 @@
 # Convex order via Wasserstein distance
 
-This repository contains the implementations of the numerical examples in the paper "A new characterisation of convex order through the 2-Wasserstein distance", which can be found under arXiv:....
+This repository contains the implementations of the numerical examples in the paper "A new characterisation of convex order through the 2-Wasserstein distance", which can be found under arXiv:
 
 ## Prerequisites
 
