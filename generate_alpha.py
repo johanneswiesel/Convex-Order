@@ -244,5 +244,4 @@ def systematic_generate_alpha(n = 500, d = 1, lbd = 1, ubd = 101, size = 10, str
     elif method == 'extrema strata probing':
         return extrema_strata_probing(n, d, lbd, ubd)
 
-  
     
