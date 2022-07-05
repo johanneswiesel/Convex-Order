@@ -781,3 +781,5 @@ def plot_an_optimalMeasure(n = 1000,p = 10, a=gauss(100, m=15, s=5),b = gauss(10
                 plot_2D_OTMatrix(a,b,opt_rho,a_grid = x1,b_grid = x3,opt_rho_grid = x2,M_a = opt_M2_a,M_b = opt_M2_b)
         
     return opt_rho    
+
+
