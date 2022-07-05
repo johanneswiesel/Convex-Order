@@ -200,7 +200,7 @@ def combined_dirac(x,n,plot = False):
     # write histogram
     hist = []
     for i in range(N):
-        hist_ls = dirac_helper(x[i],distribution[i],v)[1]
+        hist_ls = dirac(x[i],distribution[i],v)[1]
         hist = hist+hist_ls.tolist()
     hist = np.array(hist)/N
     # write bins
