@@ -1,10 +1,3 @@
-# Authors: Authors: Johannes Wiesel, Erica Zhang
-# License: MIT License
-# Version: June 30, 2022
-
-# DESCRIPTION: This package returns a list containing the histogram bins and the histogram height for an array of distributions, including customized. All histogram generating functions include a "plot" parameter that is set by default to be false. Users could turn it on to plot the histograms. 
-
-# import dependencies
 import numpy as np
 import matplotlib.pylab as pl
 from scipy import stats
@@ -12,6 +5,13 @@ from itertools import product
 import math
 from sklearn.utils import check_random_state, deprecated
 from partition_tools import *
+
+# Authors: Authors: Johannes Wiesel, Erica Zhang
+# License: MIT License
+# Version: June 30, 2022
+
+# DESCRIPTION: This package returns a list containing the histogram bins and the histogram height for an array of distributions, including customized. All histogram generating functions include a "plot" parameter that is set by default to be false. Users could turn it on to plot the histograms. 
+
 
 
 def gauss1D(n,m,s,plot = False):
@@ -53,7 +53,7 @@ def gauss1D(n,m,s,plot = False):
 
 
 def make_multiD_samples_gauss(n, m, sigma, d, random_state=None):
-     r"""Return `n` samples drawn from multi-Dimensional gaussian :math:`\mathcal{N}(m, \sigma)`
+    r"""Return `n` samples drawn from multi-Dimensional gaussian :math:`\mathcal{N}(m, \sigma)`
 
     The main idea of this function is to generate multi-dimensional gaussian samples based on sample size, mean, and standard deviation.
 
@@ -77,10 +77,6 @@ def make_multiD_samples_gauss(n, m, sigma, d, random_state=None):
     -------
     X : ndarray, shape (`n`, 2)
         n samples drawn from :math:`\mathcal{N}(m, \sigma)`.
-        
-    Reference
-    ----------
-    This code is adapted from 'make_2D_samples_gauss' from package POT
     """
     if s <= 0:
         raise ValueError("Standard Deviation must be strictly greater than zero!")
@@ -93,6 +89,7 @@ def make_multiD_samples_gauss(n, m, sigma, d, random_state=None):
     else:
         res = generator.randn(n, d) * np.sqrt(sigma) + m
     return res
+
 
 
 def create_centered_grid(x,n,v):
@@ -220,7 +217,7 @@ def combined_dirac(x,n,plot = False):
 
 
 def uniform(n,lbd,ubd,cont = True, plot = False):
-     r"""Return histogram for a uniform distribution, either continuous or discrete
+    r"""Return histogram for a uniform distribution, either continuous or discrete
 
     The main idea of this function is to generate histogram for a uniform distribution based on sample size 'n', lower bound 'lbd', upper bound 'ubd', and whether the requested uniform distribution is 'cont', or continuous or not
 
@@ -274,7 +271,7 @@ def uniform(n,lbd,ubd,cont = True, plot = False):
             pl.gcf().set_size_inches(8, 6)
             pl.show()
     return_ls = [x,hist]
-    return return_ls
+    return return_l
 
 
 def exponential(n,lam, plot = False):
@@ -997,3 +994,4 @@ def generate_histogram(name = 'Cust', plot = False):
                     print("\n")
                     bins_num = int(input("Number of bins (type: int): "))
                     return customized_distribution(n = bins_num, pdf_func = func_string, cont_domain = func_domain, cont = True, plot = plot)
+    
