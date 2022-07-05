@@ -74,7 +74,7 @@ def random_strata_probingBySize_mesh(n, d, lbd = 1, ubd = 101, size = 10):
         print("Note: math.ceil(n**(1/d)) <=2. random_sampling is invoked.",n, "alpha samples are generated. To stop this, increase n or decrease d.")
         return random_generate_alpha(n,d,lbd,ubd) # if nb of alpha samples generated in each dimension is too small, it is equivalent to random sampling
     strata_num_ls = distribute(dim_num, size)
-    # because usually dimension will be very large, so dim_num is close to 1, to optimize the algrorithm, we extract only the idices of nonzero elements
+    # because usually dimension will be very large, dim_num is close to 1, to optimize the algrorithm, we extract only the idices of nonzero elements
     nonzero_ls = list(np.array(strata_num_ls).nonzero())[0]
     # create a list of lists of samples of alpha generated for each dimension from 1 to d-1
     dim_ls = []
@@ -82,9 +82,6 @@ def random_strata_probingBySize_mesh(n, d, lbd = 1, ubd = 101, size = 10):
         sub_alpha_ls = []
         for i in range(len(nonzero_ls)):
             sub_alpha_ls.append(random.randint(strata[nonzero_ls[i]][0], strata[nonzero_ls[i]][size-1], size=(strata_num_ls[nonzero_ls[i]])).tolist())
-        # flatten list of lists
-        #sub_alpha_ls = np.array(sub_alpha_ls,dtype=object).ravel().tolist()
-        #sub_alpha_ls = [x for x in sub_alpha_ls if x.size>0] # remove empty lists
         sub_alpha_ls = sum(sub_alpha_ls,[])
         count -= 1
         dim_ls.append(sub_alpha_ls)
@@ -179,7 +176,6 @@ def random_strata_probing_mesh(strata_nb, d, lbd = 1, ubd = 101, size = 10):
 
 
 
-# for size, the total nb of alpha generated is size**d
 def extrema_strata_probing(size, d, lbd = 1, ubd = 101):  
     r"""Generate 'size**d' d-dimensional alphas by sampling only the boundary points of the partitioned grid for alpha
 
@@ -201,10 +197,8 @@ def extrema_strata_probing(size, d, lbd = 1, ubd = 101):
     alpha_ls : list, list, float64
         list of length 'strata_nb**d' where each entry is a list of length 'd,' representing each d-dimensional alpha generated
     """
-    # 1. generate all extreme points
     extrema = extreme_points(lbd,ubd,size)
     extreme_grid = np.repeat(np.array([extrema]),d,axis=0)
-    # 2. generate extrema coordinates, which are all alpha
     alpha_ls = list(product(*extreme_grid))
     print("Note:",len(alpha_ls), "alpha samples are generated.")
     return alpha_ls
