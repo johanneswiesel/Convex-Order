@@ -77,6 +77,10 @@ def make_multiD_samples_gauss(n, m, sigma, d, random_state=None):
     -------
     X : ndarray, shape (`n`, 2)
         n samples drawn from :math:`\mathcal{N}(m, \sigma)`.
+        
+    Reference
+    ----------
+    This code is adapted from 'make_2D_samples_gauss' from package POT
     """
     if s <= 0:
         raise ValueError("Standard Deviation must be strictly greater than zero!")
