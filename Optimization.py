@@ -16,7 +16,7 @@ from scipy.spatial.distance import cdist
 # Authors: Authors: Johannes Wiesel, Erica Zhang
 # Version: June 30, 2022
 
-# DESCRIPTION: This package provides 4 optimization tools to generate the minimal Wasserstein distance under an optimal measure 'rho'
+# DESCRIPTION: This package provides optimization tools to generate the minimal Wasserstein distance under an optimal measure 'rho'
 
 
 def generate_signs(n):
@@ -46,7 +46,7 @@ def generate_signs(n):
 def generate_an_optimal(n = 1000,p = 10, a=gauss(100, m=15, s=5),b = gauss(100, m=10, s=1),a_grid = np.arange(100, dtype=np.float64), b_grid = np.arange(100, dtype=np.float64), target_size = 100, lbd = 1, ubd = 101,  alpha_size = 10, strata_nb = 2, method = 'random'):
     r""" Return the minimal Wasserstein distance under an optimal measure 'rho' using "Histogram" method for d = 1
 
-    The main idea of this function is to calculate the minimal Wasserstein distance under an optimal measure 'rho'. This method models a general discrete probability measure 'rho' through using a Dirichlet distribution to model the probability mass across its finite support. As the partitioned grid (which represents the discretized support of 'rho' gets finer), 'rho' approximates to having a continuous support. For dimension one, this method calculates the minimum through using the histograms of the distributions. 
+    The main idea of this function is to calculate the minimal Wasserstein distance under an optimal measure 'rho'. This method models a general discrete probability measure 'rho' through using a dirichlet distribution to model the probability mass across its finite support. As the partitioned grid (which represents the discretized support of 'rho') gets finer, rho approximates to having a continuous support. For dimension one, this method calculates the minimum through using the histograms of the distributions. 
     
     Parameters
     ----------
@@ -145,9 +145,9 @@ def generate_an_optimal(n = 1000,p = 10, a=gauss(100, m=15, s=5),b = gauss(100, 
     
 
 def generate_an_optimal_samples(a,b,n = 1000,p=10, target_size = 100, lbd = 1, ubd = 101, alpha_size = 10, strata_nb = 2, method = 'random'):
-     r""" Return the minimal Wasserstein distance under an optimal measure 'rho' using "samples" method
+    r""" Return the minimal Wasserstein distance under an optimal measure 'rho' using "samples" method
 
-    The main idea of this function is to calculate the minimal Wasserstein distance under an optimal measure 'rho'. This method models a general discrete probability measure 'rho' through using a Dirichlet distribution to model the probability mass across its finite support. As the partitioned grid (which represents the discretized support of 'rho') gets finer, 'rho' approximates to having a continuous support. This method uses distribution samples for across all dimensions. 
+    The main idea of this function is to calculate the minimal Wasserstein distance under an optimal measure 'rho'. This method models a general discrete probability measure 'rho' through using a dirichlet distribution to model the probability mass across its finite support. As the partitioned grid (which represents the discretized support of 'rho') gets finer, rho approximates to having a continuous support. This method uses distribution samples for across all dimensions. 
     
     Parameters
     ----------
@@ -177,44 +177,44 @@ def generate_an_optimal_samples(a,b,n = 1000,p=10, target_size = 100, lbd = 1, u
     myMin : float64
         a single float that refers to the minimal Wasserstein distance found across all sampled alpha parameters
     """
-        source_a_size = len(a)
-        source_b_size = len(b)
-        x1 = np.ones((source_a_size,)) / source_a_size # uniform distribution on samples (array of bin heights rather than bin positions!)
-        x2 = np.ones((target_size,)) / target_size
-        x3 = np.ones((source_b_size,)) / source_b_size
-        # read dimension
-        # cast input into ndarray
-        a = np.array(a)
-        b = np.array(b)
-        # check input validity wrt dimensions
-        if a.ndim != b.ndim:
-            raise ValueError("Your input source distributions should come from the same dimension!")
-        d = a.ndim
-        rho_num = p**d # total number of categorical variables
-        # generate n samples of alpha, the p-dim vector
-        alpha = systematic_generate_alpha(n,rho_num,lbd,ubd,size = alpha_size, strata_nb = strata_nb, method = method)
-        # d-D grid
-        if d == 1:
-            coordinates = np.linspace(-1, 1, p)        
-        else:
-            grid = np.array([np.linspace(-1, 1, p)])
-            multi_grid = np.repeat(grid,d,axis=0)
-            coordinates = np.array(np.meshgrid(*multi_grid)).T.reshape(-1, d) # ndarray of all the discrete points in the grid
-        result = []
-        for i in range(len(alpha)):
-            dir_probability = dirichlet.rvs(alpha[i])
-            # unravel the ndarray
-            rho_rv = dir_probability.ravel() # discrete probability of each point of the grid
-            xk = np.arange(rho_num)
-            custm = stats.rv_discrete(name='custm', values=(xk, rho_rv))
-            R = custm.rvs(size=target_size) # index array
-            rho = coordinates[R]
-            M2_a = cdist(a.reshape(source_a_size,d), rho.reshape(target_size,d),lambda u, v: -np.dot(u,v)) # loss matrix        
-            M2_b = cdist(b.reshape(source_b_size,d), rho.reshape(target_size,d),lambda u, v: -np.dot(u,v)) # loss matrix        
-            diff = -ot.emd2(x1, x2, M2_a)+ ot.emd2(x3,x2, M2_b)
-            result.append(diff)
-        myMin = np.array(result).min()
-        return myMin   
+    source_a_size = len(a)
+    source_b_size = len(b)
+    x1 = np.ones((source_a_size,)) / source_a_size # uniform distribution on samples (array of bin heights rather than bin positions!)
+    x2 = np.ones((target_size,)) / target_size
+    x3 = np.ones((source_b_size,)) / source_b_size
+    # cast input into ndarray
+    a = np.array(a)
+    b = np.array(b)
+    # check input validity wrt dimensions
+    if a.ndim != b.ndim:
+        raise ValueError("Your input source distributions should come from the same dimension!")
+    # read dimension
+    d = a.ndim
+    rho_num = p**d # total number of categorical variables
+    # generate n samples of alpha, the p-dim vector
+    alpha = systematic_generate_alpha(n,rho_num,lbd,ubd,size = alpha_size, strata_nb = strata_nb, method = method)
+    # d-D grid
+    if d == 1:
+        coordinates = np.linspace(-1, 1, p)        
+    else:
+        grid = np.array([np.linspace(-1, 1, p)])
+        multi_grid = np.repeat(grid,d,axis=0)
+        coordinates = np.array(np.meshgrid(*multi_grid)).T.reshape(-1, d) # ndarray of all the discrete points in the grid
+    result = []
+    for i in range(len(alpha)):
+        dir_probability = dirichlet.rvs(alpha[i])
+        # unravel the ndarray
+        rho_rv = dir_probability.ravel() # discrete probability of each point of the grid
+        xk = np.arange(rho_num)
+        custm = stats.rv_discrete(name='custm', values=(xk, rho_rv))
+        R = custm.rvs(size=target_size) # index array
+        rho = coordinates[R]
+        M2_a = cdist(a.reshape(source_a_size,d), rho.reshape(target_size,d),lambda u, v: -np.dot(u,v)) # loss matrix        
+        M2_b = cdist(b.reshape(source_b_size,d), rho.reshape(target_size,d),lambda u, v: -np.dot(u,v)) # loss matrix        
+        diff = -ot.emd2(x1, x2, M2_a)+ ot.emd2(x3,x2, M2_b)
+        result.append(diff)
+    myMin = np.array(result).min()
+    return myMin  
 
     
 
@@ -496,8 +496,8 @@ def plot_1D_rho(p,opt_rho):
     plt.gcf().set_size_inches(12, 10)
     plt.show()
 
-def plot_2D_rho(a,b,opt_rho):  
-     r""" prints the graphs of samples from source_a distribution and source_b distribution wrt probability measure 'opt_rho' respectively in 2D space
+def plot_2D_rho(a,b,opt_rho):
+    r"""prints the graphs of samples from source_a distribution and source_b distribution wrt probability measure 'opt_rho' respectively in 2D space
 
     The main idea of this function is to print the graphs of samples from source_a distribution and source_b distribution wrt probability measure 'opt_rho' respectively in 2D space through 'Samples', 'Dirichlet Random', and 'Dirichlet' method
     
@@ -535,7 +535,7 @@ def plot_2D_rho(a,b,opt_rho):
     
 
 def plot_2D_OTMatrix (a,b,opt_rho,a_grid,b_grid,opt_rho_grid,M_a,M_b):
-r""" prints the graphs of transport matrix from source_a distribution to 'rho' and source_b distribution to 'rho'
+    r""" prints the graphs of transport matrix from source_a distribution to 'rho' and source_b distribution to 'rho'
 
     The main idea of this function is to print the graphs of prints the graphs of transport matrix from source_a distribution to 'rho' and source_b distribution to 'rho' for 2D
     
@@ -781,5 +781,3 @@ def plot_an_optimalMeasure(n = 1000,p = 10, a=gauss(100, m=15, s=5),b = gauss(10
                 plot_2D_OTMatrix(a,b,opt_rho,a_grid = x1,b_grid = x3,opt_rho_grid = x2,M_a = opt_M2_a,M_b = opt_M2_b)
         
     return opt_rho    
-
-
