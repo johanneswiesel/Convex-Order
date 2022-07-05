@@ -1,4 +1,4 @@
-from Generate_Alpha import *
+from generate_alpha import *
 from ot.datasets import make_1D_gauss as gauss
 import numpy as np
 import matplotlib.pylab as pl
