@@ -1,8 +1,3 @@
-# Authors: Authors: Johannes Wiesel, Erica Zhang
-# Version: June 30, 2022
-
-# DESCRIPTION: This package includes all sampling methods to generate alpha that we use to sample the corresponding Dirichlet distribution in the optimization algorithm.
-
 from partition_tools import *
 import numpy as np
 from scipy import stats
@@ -10,6 +5,11 @@ from itertools import product
 import scipy as scipy
 import math
 from numpy import random
+
+# Authors: Authors: Johannes Wiesel, Erica Zhang
+# Version: June 30, 2022
+
+# DESCRIPTION: This package includes all sampling methods to generate alpha that we use to sample the corresponding Dirichlet distribution in the optimization algorithm.
 
 def random_generate_alpha(n, d, lbd = 0, ubd = 100):
     r"""Generate 'n' d-dimensional alphas randomly
@@ -40,7 +40,7 @@ def random_generate_alpha(n, d, lbd = 0, ubd = 100):
 
 
 def random_strata_probingBySize_mesh(n, d, lbd = 1, ubd = 101, size = 10):
-      r"""Systematically generate 'n' d-dimensional alphas by probing linearly by size 'size' for each dimension then compose the generated alpha entries through permutation.
+    r"""Systematically generate 'n' d-dimensional alphas by probing linearly by size 'size' for each dimension then compose the generated alpha entries through permutation.
 
     The main idea of this function is to systematically generate 'n' d-dimensional alpha parameter so that we effectively sample the entire sample space for alpha. We first partition the grid for alpha to 'size' even sub-parts. We then evenly distribute the total number of alpha needed to be generated, i.e. 'n', to each sub-part. Within each sub-part, we randomly generate the perspective number of alpha parameters. Finally, we create a list of every possible permutation of the alpha entries in each dimension. Together, this gives the final list of alpha parameters sampled. 
     
@@ -92,7 +92,7 @@ def random_strata_probingBySize_mesh(n, d, lbd = 1, ubd = 101, size = 10):
 
 
 def random_strata_probingBySize_zip(n, d, lbd = 1, ubd = 101, size = 10):
-     r"""Systematically generate 'n' d-dimensional alphas by probing linearly by size 'size' for each dimension then compose the generated alpha entries through zipping the entries together.
+    r"""Systematically generate 'n' d-dimensional alphas by probing linearly by size 'size' for each dimension then compose the generated alpha entries through zipping the entries together.
 
     The main idea of this function is to systematically generate 'n' d-dimensional alpha parameter so that we effectively sample the entire sample space for alpha. We first partition the grid for alpha to 'size' even sub-parts. We then evenly distribute the total number of alpha needed to be generated, i.e. 'n', to each sub-part. Within the sub-parts, we randomly generate the perspective number of alpha parameters. Finally, we create a list of d-dim alpha paramters through directly zipping together the generated alpha entries in each dimension. Together, this gives the final list of alpha parameters sampled. 
     This method differs from the previous method in that instead of producing the final return list of alpha parameters through permutation, we simply zip the generated alpha entry in each dimension together. While this potentially reduce the time complexity of this algorithm, it is inferior at sampling the alpha parameters, since the dirichlet distribution does not only depend on the relative magnitude of alpha, but also the proportional magnitude difference in entries of the alpha parameter.
@@ -208,7 +208,7 @@ def extrema_strata_probing(size, d, lbd = 1, ubd = 101):
 def systematic_generate_alpha(n = 500, d = 1, lbd = 1, ubd = 101, size = 10, strata_nb = 2, method = 'random'):
     r"""Generate 'n' d-dimensional alpha based on a method of choice
 
-    The main idea of this function is to systematically generate 'n' d-dimensional alpha parameter based on a method of choice. Legal methods include "random", "auto random strata probing", "auto random strata probing zip", "random strata probing", extrema strata probing
+    The main idea of this function is to systematically generate 'n' d-dimensional alpha parameter based on a method of choice. Legal methods include "random", "auto random strata probing", "auto random strata probing zip", "random strata probing", and "extrema strata probing"
 
     Parameters
     ----------
@@ -244,4 +244,5 @@ def systematic_generate_alpha(n = 500, d = 1, lbd = 1, ubd = 101, size = 10, str
     elif method == 'extrema strata probing':
         return extrema_strata_probing(n, d, lbd, ubd)
 
+  
     
