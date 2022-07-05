@@ -46,7 +46,7 @@ def generate_signs(n):
 def generate_an_optimal(n = 1000,p = 10, a=gauss(100, m=15, s=5),b = gauss(100, m=10, s=1),a_grid = np.arange(100, dtype=np.float64), b_grid = np.arange(100, dtype=np.float64), target_size = 100, lbd = 1, ubd = 101,  alpha_size = 10, strata_nb = 2, method = 'random'):
     r""" Return the minimal Wasserstein distance under an optimal measure 'rho' using "Histogram" method for d = 1
 
-    The main idea of this function is to calculate the minimal Wasserstein distance under an optimal measure 'rho'. This method models a general discrete probability measure 'rho' through using a dirichlet distribution to model the probability mass across its finite support. As the partitioned grid (which represents the discretized support of 'rho') gets finer, rho approximates to having a continuous support. For dimension one, this method calculates the minimum through using the histograms of the distributions. 
+    The main idea of this function is to calculate the minimal Wasserstein distance under an optimal measure 'rho'. This method models a general discrete probability measure 'rho' through using a Dirichlet distribution to model the probability mass across its finite support. As the partitioned grid (which represents the discretized support of 'rho' gets finer), 'rho' approximates to having a continuous support. For dimension one, this method calculates the minimum through using the histograms of the distributions. 
     
     Parameters
     ----------
@@ -147,7 +147,7 @@ def generate_an_optimal(n = 1000,p = 10, a=gauss(100, m=15, s=5),b = gauss(100, 
 def generate_an_optimal_samples(a,b,n = 1000,p=10, target_size = 100, lbd = 1, ubd = 101, alpha_size = 10, strata_nb = 2, method = 'random'):
      r""" Return the minimal Wasserstein distance under an optimal measure 'rho' using "samples" method
 
-    The main idea of this function is to calculate the minimal Wasserstein distance under an optimal measure 'rho'. This method models a general discrete probability measure 'rho' through using a dirichlet distribution to model the probability mass across its finite support. As the partitioned grid (which represents the discretized support of 'rho') gets finer, rho approximates to having a continuous support. This method uses distribution samples for across all dimensions. 
+    The main idea of this function is to calculate the minimal Wasserstein distance under an optimal measure 'rho'. This method models a general discrete probability measure 'rho' through using a Dirichlet distribution to model the probability mass across its finite support. As the partitioned grid (which represents the discretized support of 'rho') gets finer, 'rho' approximates to having a continuous support. This method uses distribution samples for across all dimensions. 
     
     Parameters
     ----------
