@@ -1,3 +1,8 @@
+# Authors: Authors: Johannes Wiesel, Erica Zhang
+# Version: June 30, 2022
+
+# DESCRIPTION: This package includes all sampling methods to generate alpha that we use to sample the corresponding Dirichlet distribution in the optimization algorithm.
+
 from partition_tools import *
 import numpy as np
 from scipy import stats
@@ -5,11 +10,6 @@ from itertools import product
 import scipy as scipy
 import math
 from numpy import random
-
-# Authors: Authors: Johannes Wiesel, Erica Zhang
-# Version: June 30, 2022
-
-# DESCRIPTION: This package includes all sampling methods to generate alpha that we use to sample the corresponding Dirichlet distribution in the optimization algorithm.
 
 def random_generate_alpha(n, d, lbd = 0, ubd = 100):
     r"""Generate 'n' d-dimensional alphas randomly
