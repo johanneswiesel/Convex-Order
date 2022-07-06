@@ -10,7 +10,7 @@ from partition_tools import *
 # License: MIT License
 # Version: June 30, 2022
 
-# DESCRIPTION: This package returns a list containing the histogram bins and the histogram height for an array of distributions, including customized. All histogram generating functions include a "plot" parameter that is set by default to be false. Users could turn it on to plot the histograms. 
+# DESCRIPTION: This package returns a list containing the histogram bins and the histogram heights (i.e. sample weights) for various distributions, including the customized. All histogram generating functions include a "plot" parameter that is set by default to be false. Users could turn it on to plot the histograms. 
 
 
 
@@ -32,7 +32,7 @@ def gauss1D(n,m,s,plot = False):
 
     Returns
     -------
-    return_ls : list, float64
+    return_ls : list, ndarray, float64
         return_ls[0]: numpy.ndarray, float64
             histogram bin positions
         return_ls[1]: numpy.ndarray, float64
@@ -77,6 +77,10 @@ def make_multiD_samples_gauss(n, m, sigma, d, random_state=None):
     -------
     X : ndarray, shape (`n`, 2)
         n samples drawn from :math:`\mathcal{N}(m, \sigma)`.
+        
+    Reference
+    ---------
+    This code is adapted from POT's 'make_2D_samples_gauss' function
     """
     if s <= 0:
         raise ValueError("Standard Deviation must be strictly greater than zero!")
@@ -93,16 +97,16 @@ def make_multiD_samples_gauss(n, m, sigma, d, random_state=None):
 
 
 def create_centered_grid(x,n,v):
-    r"""Return a grid of size 'n' that is centered around 'x' with incremental size to be 'v'.
+    r"""Return a grid of size 'n' that is centered around 'x' with incremental size 'v'.
 
-    The main idea of this function is to generate an evenly-spaced centered grid for the purpose of creating ideal bin positions for dirichlet distribution
+    The main idea of this function is to generate an evenly-spaced centered grid for the purpose of creating ideal bin positions for Dirichlet distribution
 
     Parameters
     ----------
     x : float64
         a number that the resulting grid is centered around
     n : int
-        grid size (which in the context of histograms, 'n' is the number of bins)
+        grid size (which in the context of histograms, 'n' is the total number of bins)
     v : float64
         size of increment
         
@@ -147,7 +151,7 @@ def dirac(x,n,v = 1, plot = False):
 
     Returns
     -------
-    return_ls : list, float64
+    return_ls : list, ndarray, float64
         return_ls[0]: numpy.ndarray, float64
             histogram bin positions
         return_ls[1]: numpy.ndarray, float64
@@ -169,14 +173,14 @@ def dirac(x,n,v = 1, plot = False):
 
 
 def combined_dirac(x,n,plot = False):
-    r"""Return histogram for a linear combination of 2 dirac delta distribution
+    r"""Return histogram for a linear combination of 2 dirac delta distributions
 
-    The main idea of this function is to generate histogram for a linear combination of dirac delta distribution based on dirac delta argument 'x', sample size 'n'.
+    The main idea of this function is to generate histogram for a linear combination of 2 dirac delta distributions based on dirac delta argument 'x' and sample size 'n'
 
     Parameters
     ----------
-    x : float64
-        dirac delta argument; dirac measure takes 1 at this point and 0 on all others
+    x : list, float64
+        list of length 2 that includes 2 dirac delta arguments corresponding to their respective dirac delta distributions
     n : int
         sample size (or the number of bins)
     plot : bool
@@ -184,7 +188,7 @@ def combined_dirac(x,n,plot = False):
 
     Returns
     -------
-    return_ls : list, float64
+    return_ls : list, ndarray, float64
         return_ls[0]: numpy.ndarray, float64
             histogram bin positions
         return_ls[1]: numpy.ndarray, float64
@@ -192,12 +196,12 @@ def combined_dirac(x,n,plot = False):
     """
     # auto-tuning grid incremental size
     v = abs(max(x)-min(x))/(2*n)
-    # in case that all the dirac measures are the same
+    # in case that both the dirac measures are the same
     if v == 0:
         return dirac(x[0],n)
-    # write histogram
     # sort x from min to max
     np.array(x).sort()
+    # write histogram
     hist = []
     for i in range(2):
         hist_ls = dirac(x[i],n,v)[1]
@@ -236,7 +240,7 @@ def uniform(n,lbd,ubd,cont = True, plot = False):
 
     Returns
     -------
-    return_ls : list, float64
+    return_ls : list, ndarray, float64
         return_ls[0]: numpy.ndarray, float64
             histogram bin positions
         return_ls[1]: numpy.ndarray, float64
@@ -290,7 +294,7 @@ def exponential(n,lam, plot = False):
 
     Returns
     -------
-    return_ls : list, float64
+    return_ls : list, ndarray, float64
         return_ls[0]: numpy.ndarray, float64
             histogram bin positions
         return_ls[1]: numpy.ndarray, float64
@@ -325,7 +329,7 @@ def gamma(n,alpha,beta, plot = False):
 
     Returns
     -------
-    return_ls : list, float64
+    return_ls : list, ndarray, float64
         return_ls[0]: numpy.ndarray, float64
             histogram bin positions
         return_ls[1]: numpy.ndarray, float64
@@ -360,7 +364,7 @@ def beta_dist(n, alpha, beta, plot = False):
 
     Returns
     -------
-    return_ls : list, float64
+    return_ls : list, ndarray, float64
         return_ls[0]: numpy.ndarray, float64
             histogram bin positions
         return_ls[1]: numpy.ndarray, float64
@@ -398,7 +402,7 @@ def poisson(n,lam, plot = False):
 
     Returns
     -------
-    return_ls : list, float64
+    return_ls : list, ndarray, float64
         return_ls[0]: numpy.ndarray, float64
             histogram bin positions
         return_ls[1]: numpy.ndarray, float64
@@ -439,7 +443,7 @@ def bernoulli(p, plot = False):
 
     Returns
     -------
-    return_ls : list, float64
+    return_ls : list, ndarray, float64
         return_ls[0]: numpy.ndarray, float64
             histogram bin positions
         return_ls[1]: numpy.ndarray, float64
@@ -477,7 +481,7 @@ def binomial(n,N,p, plot = False):
 
     Returns
     -------
-    return_ls : list, float64
+    return_ls : list, ndarray, float64
         return_ls[0]: numpy.ndarray, float64
             histogram bin positions
         return_ls[1]: numpy.ndarray, float64
@@ -519,7 +523,7 @@ def geometric(n,p, plot = False):
 
     Returns
     -------
-    return_ls : list, float64
+    return_ls : list, ndarray, float64
         return_ls[0]: numpy.ndarray, float64
             histogram bin positions
         return_ls[1]: numpy.ndarray, float64
@@ -551,17 +555,17 @@ def geometric(n,p, plot = False):
 def check_probability(n):
     r"""Prompts user input for a probability and checks if it is valid
     
-    The main idea of this function is to aids request_ls in requesting for a valid probability
+    The main idea of this function is to aid request_ls through requesting for a valid probability
     
     Parameters
     ----------
     n : int
-        number of points in support (or the number of times requesting and checking for an input probability)
+        number of points in support (or the number of times the function requests and checks for an input probability)
 
     Returns
     -------
     number_list : list, float64
-        customized list of valid the probability
+        customized list of valid probability
     """
     number_list = []
     for i in range(0, n):
@@ -587,9 +591,9 @@ def check_probability(n):
 
 
 def request_ls(n = None,prob_ls = False):  
-    r"""Request user input for both the support of a discrete customized probability distribution and the respective probability mass
+    r"""Request user input for both the support of a discrete customized probability distribution and the respective probability mass distribution
     
-    The main idea of this function is to aid the customized discrete distribution generation function by prompting appropriate user inputs. The user can either choose to input probability mass directly and correctly or let the function auto-scales the probability.
+    The main idea of this function is to aid the customized discrete distribution generation function by prompting appropriate user inputs. The user can either choose to input probability mass directly or let the function auto-scale the probability.
     
     Parameters
     ----------
@@ -656,7 +660,7 @@ def request_ls(n = None,prob_ls = False):
     
     
 def request_pdf():
-    r"""Request user input for the domain of and the pdf function to generate their customized continuous distribution
+    r"""Request user input for the domain of a customized continuous distribution and the pdf function to generate their customized continuous distribution
     
     The main idea of this function is to aid the customized continuous distribution generation function by prompting appropriate user inputs for the domain of distribution and its pdf
     
@@ -667,8 +671,8 @@ def request_pdf():
     Returns
     -------
     result : list
-        result[0]
-        a function of a customized pdf
+        result[0] : str
+        str that writes the function of a customized pdf
     """
     result = []
     print("Enter your domain:")
@@ -697,18 +701,18 @@ def request_pdf():
 def customized_distribution(n = None,pdf_func = None, cont_domain = None, support_ls = None, prob_ls = None, cont = False, plot = False): 
     r"""Generate a customized distribution, either continuous or discrete, histogram
     
-    The main idea of this function is to generate historgam sampled from a customized distribution, either continuous or discrete, from user's inputs
+    The main idea of this function is to generate historgam sampled from a customized distribution, either continuous or discrete, according to user's inputs
     
     Parameters
     ----------
     n : int
-        number of points in support (or the number of times requesting and checking for an input probability)
+        number of points in support (or the number of times the function requests and checks for an input probability)
     pdf_func : str
         customized pdf function for a customized continuous distribution
     cont_domain : list
         customized domain for the continuous distribution
     support_ls : list
-        customized list of support of discrete distributions
+        customized list of support for a discrete distributions
     prob_ls : list
         customized list of probability mass wrt the support
     cont : bool
@@ -718,7 +722,7 @@ def customized_distribution(n = None,pdf_func = None, cont_domain = None, suppor
 
     Returns
     -------
-    return_ls : list, float64
+    return_ls : list, ndarray, float64
         return_ls[0]: numpy.ndarray, float64
             histogram bin positions
         return_ls[1]: numpy.ndarray, float64
@@ -768,19 +772,10 @@ def customized_distribution(n = None,pdf_func = None, cont_domain = None, suppor
         
         
 
-# interactive function that generates a histogram when given array of 1D samples
-# prints graph of histogram as side-effect
-
-# one input parameter: name = name of distribution, if any
-# interactive function that generates a histogram when given array of 1D samples
-# prints graph of histogram as side-effect
-
-# one input parameter: name = name of distribution, if any
-
 def generate_histogram(name = 'Cust', plot = False):
-    r"""Generate histogram based on prompted user input for the requested distribution
+    r"""Generate histogram based on prompted user inputs for the requested distribution
     
-    The main idea of this function is to interactively prompt user's request for the distribution, then prompt for the parameters needed by the respective distribution, and then generate historgam sampled from that distribution. Supported distribution and their names: "Gaussian","Uniform","Exponential", "Gamma", "Beta", "Poisson", "Bernoulli", "Binomial", "Geometric",'Cust'
+    The main idea of this function is to interactively prompt user's request for the distribution, and then prompt for the parameters needed by the respective distribution. Finally, the function generates historgam sampled from that distribution. Supported distribution and their names include: "Gaussian","Uniform","Exponential", "Gamma", "Beta", "Poisson", "Bernoulli", "Binomial", "Geometric",'Cust'
     
     Parameters
     ----------
