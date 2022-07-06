@@ -9,12 +9,12 @@ from numpy import random
 # Authors: Authors: Johannes Wiesel, Erica Zhang
 # Version: June 30, 2022
 
-# DESCRIPTION: This package includes all sampling methods to generate alpha that we use to sample the corresponding Dirichlet distribution in the optimization algorithm.
+# DESCRIPTION: This package includes all sampling methods which generate the alphas we use to sample the corresponding Dirichlet distribution in the optimization algorithm.
 
 def random_generate_alpha(n, d, lbd = 0, ubd = 100):
     r"""Generate 'n' d-dimensional alphas randomly
 
-    The main idea of this function is to randomly generate 'n' d-dimensional alpha parameter (i.e. as if drawing from a uniform distribution) within range [lbd, ubd] (inclusive) for dirichlet distribution sampling. 
+    The main idea of this function is to randomly generate 'n' d-dimensional alpha parameter (i.e. as if drawing from a uniform distribution) within range [lbd, ubd] (inclusive) for Dirichlet distribution sampling. 
 
     Parameters
     ----------
@@ -67,14 +67,14 @@ def random_strata_probingBySize_mesh(n, d, lbd = 1, ubd = 101, size = 10):
     count = d
     # discretize grid for each dimension of alpha
     x = np.arange(lbd,ubd).tolist()
-    strata = even_slice_list(x,size) # grid in each dimension is discretized in to *size* even parts
+    strata = even_slice_list(x,size) # grid in each dimension is discretized in to *size* even stratas
     # distribute total nb of random samples evenly to stratas 
     dim_num = math.ceil(n**(1/d)) # number of samples for each dimension, if distributed evenly
     if dim_num <= 2:
         print("Note: math.ceil(n**(1/d)) <=2. random_sampling is invoked.",n, "alpha samples are generated. To stop this, increase n or decrease d.")
         return random_generate_alpha(n,d,lbd,ubd) # if nb of alpha samples generated in each dimension is too small, it is equivalent to random sampling
     strata_num_ls = distribute(dim_num, size)
-    # because usually dimension will be very large, dim_num is close to 1, to optimize the algrorithm, we extract only the idices of nonzero elements
+    # because usually dimension will be very large, dim_num is close to 1, so to optimize the algrorithm, we extract only the idices of nonzero elements
     nonzero_ls = list(np.array(strata_num_ls).nonzero())[0]
     # create a list of lists of samples of alpha generated for each dimension from 1 to d-1
     dim_ls = []
@@ -137,7 +137,7 @@ def random_strata_probingBySize_zip(n, d, lbd = 1, ubd = 101, size = 10):
 def random_strata_probing_mesh(strata_nb, d, lbd = 1, ubd = 101, size = 10):
     r"""Generate 'strata_nb**d' d-dimensional alphas randomly
 
-    The main idea of this function is to systematically generate 'n' d-dimensional alpha parameter so that we effectively sample the entire sample space for alpha. We first partition the grid for alpha to 'size' even sub-parts. Within each sub-part, we randomly generate the perspective number of alpha parameters. Finally, we create a list of every possible permutation of the alpha entries in each dimension. Together, this gives the final list of alpha parameters sampled.  Unlike function 'random_strata_probingBySize_mesh(n, d, lbd = 1, ubd = 101, size = 10)', this method takes in "strata_nb" rather than 'n' as parameter. We take in 'strata_nb' as a parameter to directly control for how many alpha entries in each dimension we would like to sample for for each sub-part of the partitioned grid. 
+    The main idea of this function is to systematically generate 'n' d-dimensional alpha parameter so that we effectively sample the entire sample space for alpha. We first partition the grid for alpha to 'size' even sub-parts. Within each sub-part, we randomly generate the perspective number of alpha parameters. Finally, we create a list of every possible permutation of the alpha entries in each dimension. Together, this gives the final list of alpha parameters sampled.  Unlike function 'random_strata_probingBySize_mesh(n, d, lbd = 1, ubd = 101, size = 10)', this method takes in "strata_nb" rather than 'n' as parameter. We take in 'strata_nb' as a parameter to directly control for how many alpha entries in each dimension we would like to sample for each sub-part of the partitioned grid. 
 
     Parameters
     ----------
@@ -228,7 +228,7 @@ def systematic_generate_alpha(n = 500, d = 1, lbd = 1, ubd = 101, size = 10, str
 
     Returns
     -------
-    This function calls other functions listed above. These functions all return: 
+    This function calls other functions listed above. These functions all return: random_generate_alpha(n,d,lbd,ubd), random_strata_probingBySize_mesh(n, d, lbd, ubd, size), random_strata_probingBySize_zip(n, d, lbd, ubd, size), extrema_strata_probing(n, d, lbd, ubd)
     
     list, list, float64:
         list of length 'n' where each entry is a list of length 'd,' representing each d-dimensional alpha generated
