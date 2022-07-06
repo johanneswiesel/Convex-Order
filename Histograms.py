@@ -117,6 +117,8 @@ def create_centered_grid(x,n,v):
     for i in range(left_size):
         myval = x-(i+1)*v
         left_ls.append(myval)
+    # reverse left_ls so that it is aranged from low to high
+    left_ls.reverse()
     right_ls = []
     for j in range(right_size):
         myval = x+(j+1)*v
@@ -167,7 +169,7 @@ def dirac(x,n,v = 1, plot = False):
 
 
 def combined_dirac(x,n,plot = False):
-    r"""Return histogram for a linear combination of dirac delta distribution
+    r"""Return histogram for a linear combination of 2 dirac delta distribution
 
     The main idea of this function is to generate histogram for a linear combination of dirac delta distribution based on dirac delta argument 'x', sample size 'n'.
 
@@ -188,25 +190,23 @@ def combined_dirac(x,n,plot = False):
         return_ls[1]: numpy.ndarray, float64
             histogram heights (or sample weights)
     """
-    # find out how many dirac measures there are
-    N = len(x)
     # auto-tuning grid incremental size
-    v = abs(max(x)-min(x))/N
+    v = abs(max(x)-min(x))/(2*n)
     # in case that all the dirac measures are the same
     if v == 0:
         return dirac(x[0],n)
-    # equally split sample size 'n' to each dirac measure
-    distribution = distribute(n,N)
     # write histogram
+    # sort x from min to max
+    np.array(x).sort()
     hist = []
-    for i in range(N):
-        hist_ls = dirac(x[i],distribution[i],v)[1]
+    for i in range(2):
+        hist_ls = dirac(x[i],n,v)[1]
         hist = hist+hist_ls.tolist()
-    hist = np.array(hist)/N
+    hist = np.array(hist)/2
     # write bins
     bins = []
-    for i in range(N):
-        bins_ls = dirac(x[i],distribution[i],v)[0]
+    for i in range(2):
+        bins_ls = dirac(x[i],n,v)[0]
         bins = bins+bins_ls
     # plot histogram
     if plot == True:
