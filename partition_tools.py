@@ -13,7 +13,7 @@ import math
 def distribute(oranges, plates):
     r"""Distribute oranges evenly among plates
 
-    The main idea of this function is to distribute a given integer number(organges) evenly on s slots (plates) where the extra are randomly distributed.
+    The main idea of this function is to distribute a given integer number(organges) evenly on s slots (plates) where the extra 'oranges' are randomly distributed among 'plates'.
 
     Parameters
     ----------
@@ -28,6 +28,11 @@ def distribute(oranges, plates):
     -------
     L : list, int
         list of length = plates where each entry corresponds to the number of oranges distributed to the plate at the idex
+        
+    Reference
+    ---------
+    The name and the code are inspired by discussions on StackExchange at: 
+    https://stackoverflow.com/questions/54353083/distribute-an-integer-amount-by-a-set-of-slots-as-evenly-as-possible
     """
     if plates == 0:
         raise ValueException('Number of plates must be >1!')
@@ -47,9 +52,7 @@ def distribute(oranges, plates):
         return L       
     
 
-# partitioning a list into n equal parts 
-# even distribution method
-
+    
 def even_slice_list(input_ls, size):
     r"""Return a list sliced into 'size' equal parts
 
@@ -60,12 +63,12 @@ def even_slice_list(input_ls, size):
     input_ls : list, float64
         the list that is to be sliced evenly
     size : int
-        the requested number of parts the list is to be evenly sliced
+        the requested number of parts that the list is to be evenly sliced into
 
     Returns
     -------
     return_ls : list, list, float64
-        partitioned list of length 'size' of lists
+        return_ls contains the partitioned list of length 'size' of lists
     """
     input_size = len(input_ls)
     slice_ls = distribute(input_size,size)
@@ -77,8 +80,6 @@ def even_slice_list(input_ls, size):
     return return_ls
 
 
-# partitioning a list into n equal parts 
-# consecutive division method
 
 def slice_list(input_ls, size):
     r"""Return a list sliced into 'size' equal parts
@@ -90,12 +91,12 @@ def slice_list(input_ls, size):
     input_ls : list, float64
         the list that is to be sliced evenly
     size : int
-        the requested number of parts the list is to be evenly sliced
+        the requested number of parts that the list is to be evenly sliced into
 
     Returns
     -------
     return_ls : list, list, float64
-        partitioned list of lists
+        return_ls contains the partitioned list of length 'size' of lists
     """
     input_size = len(input_ls)
     extra = input_size%size
