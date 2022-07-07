@@ -501,7 +501,8 @@ def plot_1D_rho(xk,opt_rho,samples = False):
         # Creating histogram
         fig, ax = pl.subplots(figsize =(10, 7))
         ax.hist(opt_rho, bins = xk)
-        # Show plot
+        # Change Size and Show plot
+        pl.gcf().set_size_inches(12, 10)
         pl.show()
 
 def plot_2D_rho(a,b,opt_rho):
@@ -542,25 +543,25 @@ def plot_2D_rho(a,b,opt_rho):
     pl.title('Source B and opt_rho distributions')
     
 
-def plot_2D_OTMatrix (a,b,opt_rho,a_grid,b_grid,opt_rho_grid,M_a,M_b):
+def plot_2D_OTMatrix (a_grid,b_grid,opt_rho_grid,a,b,opt_rho,M_a,M_b):
     r""" prints the graphs of transport matrix from source_a distribution to 'rho' and source_b distribution to 'rho'
 
     The main idea of this function is to print the graphs of prints the graphs of transport matrix from source_a distribution to 'rho' and source_b distribution to 'rho' for 2D
     
     Parameters
     ----------
-    a : ndarray, float64
-        ndarray of the first source distribution. It should be of shape(n,d), where d is the dimension. For all dimensions, 'a' is simply the ndarray of samples 
-    b : ndarray, float64
-        ndarray of the second source distribution. It should be of shape(n,d), where d is the dimension. For all dimensions, 'b' is simply the ndarray of samples 
-    opt_rho : ndarray
-        ndarray of 2D samples generated from probability distribution 'rho'
     a_grid : ndarray, float64
         ndarray of sample weights for source_a distribution
     b_grid : ndarray, float64
         ndarray of sample weights for source_b distribution
     rho_grid : ndarray, float64
         ndarray of sample weights for rho
+    a : ndarray, float64
+        ndarray of the first source distribution. It should be of shape(n,d), where d is the dimension. For all dimensions, 'a' is simply the ndarray of samples 
+    b : ndarray, float64
+        ndarray of the second source distribution. It should be of shape(n,d), where d is the dimension. For all dimensions, 'b' is simply the ndarray of samples 
+    opt_rho : ndarray
+        ndarray of 2D samples generated from probability distribution 'rho'
     M_a : ndarray, float64
         ndarray of squared euclidean distance from source_a distribution to rho
     M_b : ndarray, float64
@@ -577,27 +578,31 @@ def plot_2D_OTMatrix (a,b,opt_rho,a_grid,b_grid,opt_rho_grid,M_a,M_b):
     codes here are adapted from POT's example: "Optimal Transport between 2D empirical distributions": https://pythonot.github.io/auto_examples/plot_OT_2D_samples.html#sphx-glr-auto-examples-plot-ot-2d-samples-py
     """
     
-    G0 = ot.emd(a, opt_rho, M_a)
-    pl.figure(1)
+    G0 = ot.emd(a_grid, opt_rho_grid, M_a)
+    pl.figure(3)
     pl.imshow(G0, interpolation='nearest')
     pl.title('OT matrix for Source_a and Opt_rho')
-    pl.figure(2)
-    ot.plot.plot2D_samples_mat(a_grid, rho_grid, G0, c=[.5, .5, 1])
-    pl.plot(a_grid[:, 0], a_grid[:, 1], '+b', label='Source a samples')
-    pl.plot(rho_grid[:, 0], rho_grid[:, 1], 'xr', label='Target (opt_rho) samples')
-    pl.legend(loc=0)
-    pl.title('OT matrix with samples: Source_a and Opt_rho')
-    
-    G1 = ot.emd(b, opt_rho, M_b)
-    pl.figure(3)
-    pl.imshow(G1, interpolation='nearest')
-    pl.title('OT matrix for Source_a and Opt_rho')
+    pl.gcf().set_size_inches(12, 10)
     pl.figure(4)
-    ot.plot.plot2D_samples_mat(b_grid, rho_grid, G1, c=[.5, .5, 1])
-    pl.plot(b_grid[:, 0], b_grid[:, 1], '+b', label='Source b samples')
-    pl.plot(rho_grid[:, 0], rho_grid[:, 1], 'xr', label='Target (opt_rho) samples')
+    ot.plot.plot2D_samples_mat(a, opt_rho, G0, c=[.5, .5, 1])
+    pl.plot(a[:, 0], a[:, 1], '+b', label='Source a samples')
+    pl.plot(opt_rho[:, 0], opt_rho[:, 1], 'xr', label='Target (opt_rho) samples')
     pl.legend(loc=0)
     pl.title('OT matrix with samples: Source_a and Opt_rho')
+    pl.gcf().set_size_inches(12, 10)
+    
+    G1 = ot.emd(b_grid, opt_rho_grid, M_b)
+    pl.figure(5)
+    pl.imshow(G1, interpolation='nearest')
+    pl.title('OT matrix for Sourceb and Opt_rho')
+    pl.gcf().set_size_inches(12, 10)
+    pl.figure(6)
+    ot.plot.plot2D_samples_mat(b, opt_rho, G1, c=[.5, .5, 1])
+    pl.plot(b[:, 0], b[:, 1], '+b', label='Source b samples')
+    pl.plot(opt_rho[:, 0], opt_rho[:, 1], 'xr', label='Target (opt_rho) samples')
+    pl.legend(loc=0)
+    pl.title('OT matrix with samples: Source_b and Opt_rho')
+    pl.gcf().set_size_inches(12, 10)
 
 
 def min_max_grid(opt_rho):
@@ -773,7 +778,7 @@ def plot_an_optimalMeasure(n = 1000,p = 10, a=gauss(100, m=15, s=5),b = gauss(10
                 # plot optimal rho
                 plot_2D_rho(a,b,opt_rho)             
                 # plot 2D OT (EMD) transport map
-                plot_2D_OTMatrix(a,b,opt_rho,a_grid = x1,b_grid = x3,opt_rho_grid = x2,M_a = opt_M2_a,M_b = opt_M2_b)
+                plot_2D_OTMatrix(a_grid = x1,b_grid = x3, opt_rho_grid = x2,a = a,b = b,opt_rho= opt_rho,M_a = opt_M2_a,M_b = opt_M2_b)
                 
            
         
@@ -831,8 +836,8 @@ def plot_an_optimalMeasure(n = 1000,p = 10, a=gauss(100, m=15, s=5),b = gauss(10
             else:
                 # plot optimal rho
                 plot_2D_rho(a,b,opt_rho)             
-                # plot 2D OT (EMD) transport map
-                plot_2D_OTMatrix(a,b,opt_rho,a_grid = x1,b_grid = x3,opt_rho_grid = x2,M_a = opt_M2_a,M_b = opt_M2_b)
+                 # plot 2D OT (EMD) transport map
+                plot_2D_OTMatrix(a_grid = x1,b_grid = x3, opt_rho_grid = x2,a = a,b = b,opt_rho= opt_rho,M_a = opt_M2_a,M_b = opt_M2_b)
         
     return opt_rho    
 
