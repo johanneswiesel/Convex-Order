@@ -815,7 +815,7 @@ def plot_an_optimalMeasure(n = 1000,p = 10, a=gauss(100, m=15, s=5),b = gauss(10
                     rho = dir_probability[:,:d].ravel() # rho_variable itself
                     rho = signs*rho
                     if d > 1:
-                        rho = np.array(np.array_split(rho_list, target_size, axis=0))
+                        rho = np.array(np.array_split(rho, target_size, axis=0))
                     M2_a = cdist(a.reshape(source_a_size,d), rho.reshape(target_size,d),lambda u, v: -np.dot(u,v)) # loss matrix   
                     M2_b = cdist(b.reshape(source_b_size,d), rho.reshape(target_size,d),lambda u, v: -np.dot(u,v)) # loss matrix   
                     diff = -ot.emd2(x1, x2, M2_a)+ ot.emd2(x3,x2, M2_b)
