@@ -469,17 +469,19 @@ def sample_inference(N = 100, n = 1000,p = 10, a=gauss(100, m=20, s=5),b = gauss
     return return_result
 
 
-def plot_1D_rho(p,opt_rho):
+def plot_1D_rho(xk,opt_rho,samples = False):
     r""" prints the histogram of a discrete probability distribution 'rho'
 
     The main idea of this function is to print the 1D discrete optimal probability method 'rho' sampled through 'Histogram' method
     
     Parameters
     ----------
-    p : int
-        number whereby we partition the grid for the support of the optimal measure 'rho'
-    opt_rho : ndarray
+    xk : ndarray, float64
+        xk is the grid for the histogram (or "rho_grid")
+    opt_rho : ndarray, float64
         ndarray of point-wise probability with respect to each point in the corresponding support
+    samples : bool
+        TRUE if method is Samples"; FALSE if method is "Hist"
                
     Returns
     -------
@@ -487,14 +489,20 @@ def plot_1D_rho(p,opt_rho):
     
     prints graphs as side effects
     """
-    xk = np.arange(p)
-    custm = stats.rv_discrete(name='custm', values=(xk, opt_rho))
-    fig, ax = plt.subplots(1, 1)
-    ax.plot(xk, custm.pmf(xk), 'ro', ms=12, mec='r')
-    ax.vlines(xk, 0, custm.pmf(xk), colors='r', lw=4)
-    # change size of plot
-    plt.gcf().set_size_inches(12, 10)
-    plt.show()
+    if not samples:
+        custm = stats.rv_discrete(name='custm', values=(xk, opt_rho))
+        fig, ax = pl.subplots(1, 1)
+        ax.plot(xk, custm.pmf(xk), 'ro', ms=12, mec='r')
+        ax.vlines(xk, 0, custm.pmf(xk), colors='r', lw=4)
+        # change size of plot
+        pl.gcf().set_size_inches(12, 10)
+        pl.show()
+    else:
+        # Creating histogram
+        fig, ax = pl.subplots(figsize =(10, 7))
+        ax.hist(opt_rho, bins = xk)
+        # Show plot
+        pl.show()
 
 def plot_2D_rho(a,b,opt_rho):
     r"""prints the graphs of samples from source_a distribution and source_b distribution wrt probability measure 'opt_rho' respectively in 2D space
@@ -524,13 +532,13 @@ def plot_2D_rho(a,b,opt_rho):
     pl.plot(a[:, 0], a[:, 1], '+b', label='Source samples')
     pl.plot(opt_rho[:, 0], opt_rho[:, 1], 'xr', label='Target samples')
     pl.legend(loc=0)
-    plt.gcf().set_size_inches(12, 10)
+    pl.gcf().set_size_inches(12, 10)
     pl.title('Source A and opt_rho distributions')
     pl.figure(2)
     pl.plot(b[:, 0], b[:, 1], '+b', label='Source samples')
     pl.plot(opt_rho[:, 0], opt_rho[:, 1], 'xr', label='Target samples')
     pl.legend(loc=0)
-    plt.gcf().set_size_inches(12, 10)
+    pl.gcf().set_size_inches(12, 10)
     pl.title('Source B and opt_rho distributions')
     
 
@@ -563,6 +571,10 @@ def plot_2D_OTMatrix (a,b,opt_rho,a_grid,b_grid,opt_rho_grid,M_a,M_b):
     void
     
     prints graphs as side effects
+    
+    Reference
+    ----------
+    codes here are adapted from POT's example: "Optimal Transport between 2D empirical distributions": https://pythonot.github.io/auto_examples/plot_OT_2D_samples.html#sphx-glr-auto-examples-plot-ot-2d-samples-py
     """
     
     G0 = ot.emd(a, opt_rho, M_a)
@@ -586,7 +598,38 @@ def plot_2D_OTMatrix (a,b,opt_rho,a_grid,b_grid,opt_rho_grid,M_a,M_b):
     pl.plot(rho_grid[:, 0], rho_grid[:, 1], 'xr', label='Target (opt_rho) samples')
     pl.legend(loc=0)
     pl.title('OT matrix with samples: Source_a and Opt_rho')
+
+
+def min_max_grid(opt_rho):
+    r""" Returns evenly-spaced grid with min equal to passed-in sample min and max equal to passed-in sample max
+
+    The main idea of this function is to auto create an evenly-spaced grid based on sample max and min.
     
+    Parameters
+    ----------
+    opt_rho : ndarray
+        ndarray of 1D samples generated from probability distribution 'rho' or just any 1D samples
+            
+    Returns
+    -------
+    grid : ndarray 
+        ndarray of the generated grid
+    """
+    # target size
+    target_size = len(opt_rho)
+    # parition size
+    N = math.ceil(3*target_size/4)
+    # min and max
+    opt_min = opt_rho.min()
+    opt_max = opt_rho.max()
+    # calculate increment
+    increment = (opt_max-opt_min)/N
+    # create grid
+    grid = []
+    for i in range(N+1):
+        grid.append(opt_min+i*increment)
+    return np.array(grid)
+                
 
 
 def plot_an_optimalMeasure(n = 1000,p = 10, a=gauss(100, m=15, s=5),b = gauss(100, m=10, s=1),a_grid = np.arange(100, dtype=np.float64), b_grid = np.arange(100, dtype=np.float64), target_size = 100, lbd = 1, ubd = 101,  alpha_size = 10, strata_nb = 2, method = 'random', op_method = "Hist"):
@@ -654,9 +697,7 @@ def plot_an_optimalMeasure(n = 1000,p = 10, a=gauss(100, m=15, s=5),b = gauss(10
     
     if d != 1 and op_method == "Hist":
         raise ValueError("Histogram Method is only available for 1-dimensional distributions!")
-        
-    # generate n samples of alpha, the p-dim vector
-    alpha = systematic_generate_alpha(n,rho_num,lbd,ubd,size = alpha_size, strata_nb = strata_nb, method = method)
+    
     
     # if user chooses 'histogram' method
     if op_method == "Hist": 
@@ -665,6 +706,8 @@ def plot_an_optimalMeasure(n = 1000,p = 10, a=gauss(100, m=15, s=5),b = gauss(10
         # (2). calculate cost matrixes
         M2_a = cdist(a_grid.reshape((source_a_size, 1)), rho_grid.reshape((p, 1)),  lambda u, v: -np.dot(u,v))
         M2_b = cdist(b_grid.reshape((source_b_size, 1)), rho_grid.reshape((p, 1)),  lambda u, v: -np.dot(u,v))
+        # generate n samples of alpha, the p-dim vector
+        alpha = systematic_generate_alpha(n,p,lbd,ubd,size = alpha_size, strata_nb = strata_nb, method = method)
         result = []
         rho_list = []
         for i in range(n):
@@ -677,7 +720,7 @@ def plot_an_optimalMeasure(n = 1000,p = 10, a=gauss(100, m=15, s=5),b = gauss(10
         min_idx = result.index(min(result))
         opt_rho = rho_list[min_idx]
         # plot optimal rho
-        plot_1D_rho(p,opt_rho)
+        plot_1D_rho(rho_grid,opt_rho)
 
         
     # set up for non-hist methods
@@ -696,6 +739,8 @@ def plot_an_optimalMeasure(n = 1000,p = 10, a=gauss(100, m=15, s=5),b = gauss(10
                 grid = np.array([np.linspace(-1, 1, p)])
                 multi_grid = np.repeat(grid,d,axis=0)
                 coordinates = np.array(np.meshgrid(*multi_grid)).T.reshape(-1, d) # ndarray of all the discrete points in the grid
+            # generate alpha
+            alpha = systematic_generate_alpha(n,rho_num,lbd,ubd,size = alpha_size, strata_nb = strata_nb, method = method)
             rho_list = []
             result = []
             M2_a_list = []
@@ -721,7 +766,9 @@ def plot_an_optimalMeasure(n = 1000,p = 10, a=gauss(100, m=15, s=5),b = gauss(10
             opt_M2_b = M2_b_list[min_idx]
             # plot optimal rho
             if d == 1:
-                plot_1D_rho(p,opt_rho)
+                # create scaled grid
+                xk = min_max_grid(opt_rho)
+                plot_1D_rho(xk,opt_rho, samples = True)
             else:
                 # plot optimal rho
                 plot_2D_rho(a,b,opt_rho)             
@@ -737,6 +784,8 @@ def plot_an_optimalMeasure(n = 1000,p = 10, a=gauss(100, m=15, s=5),b = gauss(10
             result = []
             M2_a_list = []
             M2_b_list = []
+            # generate alpha
+            alpha = systematic_generate_alpha(n,dirichlet_dim,lbd,ubd,size = alpha_size, strata_nb = strata_nb, method = method)
             for i in range(len(alpha)):
                 dir_probability = dirichlet.rvs(alpha[i],size=(target_size))
                 # randomly generate signs
@@ -744,26 +793,29 @@ def plot_an_optimalMeasure(n = 1000,p = 10, a=gauss(100, m=15, s=5),b = gauss(10
             
                 # 2.1 Dirichlet Random Method
                 if op_method == "Dirichlet Random":
-                    rho_random = random.choice(dir_probability.ravel(),size = (int(target_size*d))) # return type is numpy.ndarray
-                    rho_random = signs*rho_random
+                    rho = random.choice(dir_probability.ravel(),size = (int(target_size*d))) # return type is numpy.ndarray
+                    rho= signs*rho
                     if d > 1:
-                        rho_random = np.array(np.array_split(rho_random, target_size, axis=0)) # list of target_size sub-arrays of d entries converted to array
-                    M2_a = cdist(a.reshape(source_a_size,d), rho_random.reshape(target_size,d),lambda u, v: -np.dot(u,v)) # loss matrix   
-                    M2_b = cdist(b.reshape(source_b_size,d), rho_random.reshape(target_size,d),lambda u, v: -np.dot(u,v)) # loss matrix   
+                        rho = np.array(np.array_split(rho, target_size, axis=0)) # list of target_size sub-arrays of d entries converted to array
+                    M2_a = cdist(a.reshape(source_a_size,d), rho.reshape(target_size,d),lambda u, v: -np.dot(u,v)) # loss matrix   
+                    M2_b = cdist(b.reshape(source_b_size,d), rho.reshape(target_size,d),lambda u, v: -np.dot(u,v)) # loss matrix   
                     diff = -ot.emd2(x1, x2, M2_a)+ ot.emd2(x3,x2, M2_b)
                     result.append(diff)
-                    rho_list.append(rho_random)
+                    rho_list.append(rho)
+                    M2_a_list.append(M2_a)
+                    M2_b_list.append(M2_b)
                 
                 # 2.2 Dirichlet Method
                 else:
                     rho = dir_probability[:,:d].ravel() # rho_variable itself
                     rho = signs*rho
                     if d > 1:
-                        rho = np.array(np.array_split(rho, target_size, axis=0))
+                        rho = np.array(np.array_split(rho_list, target_size, axis=0))
                     M2_a = cdist(a.reshape(source_a_size,d), rho.reshape(target_size,d),lambda u, v: -np.dot(u,v)) # loss matrix   
                     M2_b = cdist(b.reshape(source_b_size,d), rho.reshape(target_size,d),lambda u, v: -np.dot(u,v)) # loss matrix   
                     diff = -ot.emd2(x1, x2, M2_a)+ ot.emd2(x3,x2, M2_b)
                     result.append(diff)
+                    rho_list.append(rho)
                     M2_a_list.append(M2_a)
                     M2_b_list.append(M2_b)
                     
@@ -773,7 +825,9 @@ def plot_an_optimalMeasure(n = 1000,p = 10, a=gauss(100, m=15, s=5),b = gauss(10
             opt_M2_b = M2_b_list[min_idx]
             # plot optimal rho
             if d == 1:
-                plot_1D_rho(p,opt_rho)
+                # create scaled grid
+                xk = min_max_grid(opt_rho)
+                plot_1D_rho(xk,opt_rho, samples = True)
             else:
                 # plot optimal rho
                 plot_2D_rho(a,b,opt_rho)             
