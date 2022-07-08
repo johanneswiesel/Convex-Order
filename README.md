@@ -8,7 +8,7 @@ Python, NumPy, SciPy, Matplotlib, OT. The programs were tested with Python 3.7.0
 
 ## Running the programs
 
-Running the jupyter notebook plots the figures. The python files are used for the implementation of the optimization procedure.
+Running the jupyter notebook plots the figures. The python files are used for the implementation of the optimization procedure. An interactive version of 'Main.ipynb' can be tested and run by visitors here: https://colab.research.google.com/github/johanneswiesel/Convex-Order/blob/main/Main.ipynb.
 
 # License
 
