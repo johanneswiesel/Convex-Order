@@ -74,7 +74,7 @@ def random_strata_probingBySize_mesh(n, d, lbd = 1, ubd = 101, size = 10):
         print("Note: math.ceil(n**(1/d)) <=2. random_sampling is invoked.",n, "alpha samples are generated. To stop this, increase n or decrease d.")
         return random_generate_alpha(n,d,lbd,ubd) # if nb of alpha samples generated in each dimension is too small, it is equivalent to random sampling
     strata_num_ls = distribute(dim_num, size)
-    # because usually dimension will be very large, dim_num is close to 1, so to optimize the algrorithm, we extract only the idices of nonzero elements
+    # because usually dimension will be very large, dim_num is close to 1, to optimize the algrorithm, we extract only the idices of nonzero elements
     nonzero_ls = list(np.array(strata_num_ls).nonzero())[0]
     # create a list of lists of samples of alpha generated for each dimension from 1 to d-1
     dim_ls = []
