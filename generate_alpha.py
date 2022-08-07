@@ -11,7 +11,7 @@ from numpy import random
 
 # DESCRIPTION: This package includes all sampling methods which generate the alphas we use to sample the corresponding Dirichlet distribution in the optimization algorithm.
 
-def random_generate_alpha(n, d, lbd = 0, ubd = 100):
+def random_generate_alpha(n, d, lbd = 1, ubd = 101):
     r"""Generate 'n' d-dimensional alphas randomly
 
     The main idea of this function is to randomly generate 'n' d-dimensional alpha parameter (i.e. as if drawing from a uniform distribution) within range [lbd, ubd] (inclusive) for Dirichlet distribution sampling. 
