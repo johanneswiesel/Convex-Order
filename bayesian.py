@@ -8,6 +8,7 @@ import math
 from scipy import stats
 from itertools import product
 from scipy.spatial.distance import cdist
+from numpy import random
 from hyperopt import hp, tpe, fmin, Trials, STATUS_OK, plotting
 
 # Authors: Johannes Wiesel, Erica Zhang
@@ -61,7 +62,7 @@ def return_search_space(p,d):
     return my_dict
 
 
-def bayesian_optimization(method, a, b, a_grid = 0, b_grid = 0, plot = False, p=5, target_size = 100, lbd = 1, ubd = 101, algo = tpe.suggest, max_eval = 300, as_dict = True):
+def bayesian_optimization(method, a, b, a_grid = np.arange(100, dtype=np.float64), b_grid = np.arange(100, dtype=np.float64), plot = False, p=5, target_size = 100, lbd = 1, ubd = 101, algo = tpe.suggest, max_eval = 300, as_dict = True):
     r"""provides bayesian optimization with respect to each provided modelling methods.
 
     The main idea of this function is to provide bayesian optimization with respect to each provided modelling methods.
@@ -74,10 +75,10 @@ def bayesian_optimization(method, a, b, a_grid = 0, b_grid = 0, plot = False, p=
         ndarray of the first source distribution. It should be of shape(n,d), where d is the dimension. For d = 1, 'a' is the ndarray of sample weights (or histograms) of the source distribution. For d > 1, 'a' is simply the ndarray of samples 
     b : ndarray, float64
         ndarray of the second source distribution. It should be of shape(n,d), where d is the dimension. For d = 1, 'b' is the ndarray of sample weights (or histograms) of the source distribution. For d > 1, 'b' is simply the ndarray of samples
-    a_grid : ndarray, float64 / int
-        ndarray of the histogram grid for the first source distribution. This parameter is only required for method == 'hist'; if a_grid == 0, the default grid will be invoked
-    b_grid : ndarray, float64 / int
-        ndarray of the histogram grid for the second source distribution. This parameter is only required for method == 'hist'; if b_grid == 0, the default grid will be invoked
+    a_grid : ndarray, float64
+        ndarray of the histogram grid for the first source distribution. This parameter is only required for method == 'hist'
+    b_grid : ndarray, float64 
+        ndarray of the histogram grid for the second source distribution. This parameter is only required for method == 'hist'
     plot: bool
         chooses to plot (or not plot) the hyperopt graph
     p : int
@@ -103,6 +104,8 @@ def bayesian_optimization(method, a, b, a_grid = 0, b_grid = 0, plot = False, p=
         a list of lists containing the minimal Wasserstein distance and the optimizing parameter rho
     """    
     # initialize static parameters
+    a_grid = np.array(a_grid)
+    b_grid = np.array(b_grid)
     global source_a_size
     source_a_size = len(a)
     global source_b_size
@@ -118,15 +121,9 @@ def bayesian_optimization(method, a, b, a_grid = 0, b_grid = 0, plot = False, p=
     global ts
     ts = target_size
     global mu_grid
-    if a_grid == 0:
-        mu_grid = np.arange(source_a_size, dtype=np.float64)
-    else:
-        mu_grid = a_grid
+    mu_grid = a_grid
     global nu_grid
-    if a_grid == 0:
-        nu_grid = np.arange(source_b_size, dtype=np.float64)
-    else:
-        nu_grid = b_grid
+    nu_grid = b_grid
     if method == "samples":
         return hyperopt_samples(lbd, ubd, algo, max_eval, plot, as_dict)
     elif method == "hist":
