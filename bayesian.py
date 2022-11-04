@@ -101,7 +101,7 @@ def bayesian_optimization(method, a, b, a_grid = np.arange(100, dtype=np.float64
     best : dictionary (if as_dict == True)
         a dictionary containing the optimizing rho
     result : list, list, float64 (if as_dict == False)
-        a list of lists containing the minimal Wasserstein distance and the optimizing parameter rho
+        a list of lists containing the minimal Wasserstein distance and the optimizing parameter alpha
     """    
     # initialize static parameters
     a_grid = np.array(a_grid)
@@ -365,3 +365,13 @@ def wasserstein_dist_diff_dir(params):
     M2_b = cdist(nu.reshape(source_b_size,d), rho_choice.reshape(ts,d),lambda u, v: -np.dot(u,v)) # loss matrix       
     diff = -ot.emd2(x1, x2, M2_a)+ ot.emd2(x3,x2, M2_b)
     return {'loss': diff, 'status': STATUS_OK,'my_param': rho_choice}
+
+
+def get_opt_rho(opt_alpha, ts):
+    p = len(opt_alpha)
+    dir_probability = dirichlet.rvs(opt_alpha)
+    rho_rv = dir_probability.ravel()
+    rho_samples = []
+    for i in range(ts):
+        rho_samples.append(np.random.choice(np.linspace(-1, 1, p), p=rho_rv))
+    return [rho_rv,rho_samples]
