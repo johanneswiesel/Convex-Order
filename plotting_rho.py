@@ -3,9 +3,12 @@ from Histograms import *
 
 import seaborn as sns
 import bezier
+from scipy.interpolate import InterpolatedUnivariateSpline
+from scipy.interpolate import make_interp_spline
+import statsmodels.api as sm
 
 # Authors: Johannes Wiesel, Erica Zhang
-# Version: September 30, 2022
+# Version: October 30, 2022
 
 # DESCRIPTION: This package provides tools to visualize the optimal rho measure obtained via bayesian optimization
 
@@ -158,3 +161,124 @@ def plot_samples_histogram(a,b,rho_hist, transport_mat = True):
 
     pl.legend()
     pl.show()
+    
+    
+# plot transport map as a function    
+def transport_function(b,rho_rv):
+    rho_rv = np.array(rho_rv)
+    b_size = len(b)
+    rho_rv_size = len(rho_rv)
+    
+    print("b:", b)
+    print()
+    
+    print("rho", rho_rv)
+    print()
+    
+    
+    x2 = np.ones((rho_rv_size,)) / rho_rv_size
+    x3 = np.ones((b_size,)) / b_size
+    
+    Mb = ot.dist(rho_rv.reshape((rho_rv_size, 1)), b.reshape((b_size, 1)))
+    Gb = ot.emd(x2, x3, Mb)
+    
+    print('Gb', Gb)
+    print()
+    
+    ls = []
+    for i in range(rho_rv_size):
+        ls.append([x * rho_rv[i].tolist() for x in Gb[i].tolist()])
+        
+    ls = np.array(ls).reshape(rho_rv_size, b_size)
+    
+    print(ls)
+     
+    y_ls = []
+    for i in range(b_size):
+        y_ls.append(ls.T[i].mean())
+        
+    lowess = sm.nonparametric.lowess(y_ls, b, frac=0.1)
+        
+    pl.plot(b, y_ls, '+')
+    pl.plot(lowess[:, 0], lowess[:, 1])
+    pl.show()
+
+    
+
+# return integrated function of the transport map
+
+def int_function(b,rho_rv):
+    rho_rv = np.array(rho_rv)
+    b_size = len(b)
+    rho_rv_size = len(rho_rv)
+    
+    x2 = np.ones((rho_rv_size,)) / rho_rv_size
+    x3 = np.ones((b_size,)) / b_size
+    
+    Mb = ot.dist(rho_rv.reshape((rho_rv_size, 1)), np.array(b).reshape((b_size, 1)))
+    Gb = ot.emd(x2, x3, Mb)
+    
+    ls = []
+    for i in range(rho_rv_size):
+        ls.append([x * rho_rv[i].tolist() for x in Gb[i].tolist()])
+        
+    ls = np.array(ls).reshape(rho_rv_size, b_size)
+     
+    y_ls = []
+    for i in range(b_size):
+        y_ls.append(ls.T[i].mean())
+        
+    # sort b
+    myorder = np.argsort(np.array(b)) # get the sorted index order
+    b.sort()
+    
+    # change order of y_ls accordingly
+    y_ls = [y_ls[i] for i in myorder]
+        
+    f = InterpolatedUnivariateSpline(b, y_ls, k=1)
+    
+    return f
+        
+
+# plot the integrated function of the transport map : smoothed version
+def plot_int_function_smooth(b,rho_rv): 
+    b = list(b)
+    f = int_function(b,rho_rv)
+    lbd = min(b)-1
+    res_ls = []
+    for i in range(len(b)):
+        temp = f.integral(lbd,b[i])
+        res_ls.append(temp)
+        
+    X_Y_Spline = make_interp_spline(b, res_ls)
+ 
+    # Returns evenly spaced numbers over a specified interval.
+    X = np.linspace(min(b), max(b), 500)
+    Y = X_Y_Spline(X)
+ 
+    # Plotting the Graph
+    pl.plot(X, Y)
+    pl.title("Integrated Function")
+    pl.xlabel("Source b")
+    pl.show()
+    
+# plot the integrated function of the transport map : lowess version
+def plot_int_function_lowess(b,rho_rv): 
+    b = list(b)
+    f = int_function(b,rho_rv)
+    lbd = min(b)-1
+    res_ls = []
+    for i in range(len(b)):
+        temp = f.integral(lbd,b[i])
+        res_ls.append(temp)
+        
+    lowess = sm.nonparametric.lowess(res_ls, b, frac=0.1)
+        
+    pl.plot(b, res_ls, '+')
+    pl.plot(lowess[:, 0], lowess[:, 1])
+    pl.title("Integrated Function")
+    pl.xlabel("Source b")
+    pl.show()
+
+
+
