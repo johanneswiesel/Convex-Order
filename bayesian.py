@@ -289,7 +289,7 @@ def wasserstein_dist_diff_samples(params):
     rho = coordinates[R]
     M2_a = cdist(mu.reshape(source_a_size,d), rho.reshape(ts,d),lambda u, v: -np.dot(u,v)) # loss matrix        
     M2_b = cdist(nu.reshape(source_b_size,d), rho.reshape(ts,d),lambda u, v: -np.dot(u,v)) # loss matrix        
-    diff = -ot.emd2(x1, x2, M2_a)+ ot.emd2(x3,x2, M2_b)
+    diff = ot.emd2(x1, x2, M2_a)-ot.emd2(x3,x2, M2_b)
     return diff
 
 
@@ -317,7 +317,7 @@ def wasserstein_dist_diff_hist(params):
     dir_probability = dirichlet.rvs(alpha)
     # unravel the ndarray
     rho_rv = dir_probability.ravel()
-    diff = -ot.emd2(mu, rho_rv, M2_a)+ ot.emd2(nu, rho_rv, M2_b)
+    diff = ot.emd2(mu, rho_rv, M2_a)-ot.emd2(nu, rho_rv, M2_b)
     return diff
 
 def wasserstein_dist_diff_dir(params):
@@ -350,7 +350,7 @@ def wasserstein_dist_diff_dir(params):
         rho_choice = np.array(np.array_split(rho_choice, ts, axis=0)) # list of target_size sub-arrays of d entries converted to array
     M2_a = cdist(mu.reshape(source_a_size,d), rho_choice.reshape(ts,d),lambda u, v: -np.dot(u,v)) # loss matrix       
     M2_b = cdist(nu.reshape(source_b_size,d), rho_choice.reshape(ts,d),lambda u, v: -np.dot(u,v)) # loss matrix       
-    diff = -ot.emd2(x1, x2, M2_a)+ ot.emd2(x3,x2, M2_b)
+    diff = ot.emd2(x1, x2, M2_a)-ot.emd2(x3,x2, M2_b)
     return {'loss': diff, 'status': STATUS_OK,'my_param': rho_choice}
 
 
