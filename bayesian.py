@@ -18,9 +18,7 @@ from hyperopt import hp, tpe, fmin, Trials, STATUS_OK, plotting
 
 def generate_signs(n):
     r"""Generate 'n' -1 or 1
-
     The main idea of this function is to randomly generate 'n' signs 
-
     Parameters
     ----------
     n : int
@@ -41,9 +39,7 @@ def generate_signs(n):
 
 def return_search_space(p,d):
     r"""Generate search space for alpha
-
     The main idea of this function is to iteratively define a search space for multidimensional vector alpha
-
     Parameters
     ----------
     p : int
@@ -62,11 +58,9 @@ def return_search_space(p,d):
     return my_dict
 
 
-def bayesian_optimization(method, a, b, a_grid = np.arange(100, dtype=np.float64), b_grid = np.arange(100, dtype=np.float64), plot = False, p=5, target_size = 100, lbd = 1, ubd = 101, algo = tpe.suggest, max_eval = 300, as_dict = True):
+def bayesian_optimization(method, a, b, a_grid = np.arange(100, dtype=np.float64), b_grid = np.arange(100, dtype=np.float64), plot = False, p=5, target_size = 100, lbd = 1, ubd = 101, algo = tpe.suggest, max_eval = 300, as_dict = False):
     r"""provides bayesian optimization with respect to each provided modelling methods.
-
     The main idea of this function is to provide bayesian optimization with respect to each provided modelling methods.
-
     Parameters
     ----------
     method: str
@@ -134,11 +128,9 @@ def bayesian_optimization(method, a, b, a_grid = np.arange(100, dtype=np.float64
         raise Exception("Please choose a valid method : 'samples', 'hist', or 'dir' . ")
 
         
-def hyperopt_samples(lbd = 1, ubd = 101, algo = tpe.suggest, max_eval = 300, plot = False, as_dict = True):
+def hyperopt_samples(lbd = 1, ubd = 101, algo = tpe.suggest, max_eval = 300, plot = False, as_dict = False):
     r"""hyperopt method for the "Indirect dirichlet with samples" model
-
     The main idea of this function is to return the appropriate hyperopt fmin solver for the "Indirect dirichlet with samples" model.
-
     Parameters
     ----------
     lbd : float64
@@ -178,11 +170,9 @@ def hyperopt_samples(lbd = 1, ubd = 101, algo = tpe.suggest, max_eval = 300, plo
         result = [[best_loss],best_alpha]
         return result
 
-def hyperopt_hist(lbd = 1, ubd = 101, algo = tpe.suggest, max_eval = 300, plot = False, as_dict = True):
+def hyperopt_hist(lbd = 1, ubd = 101, algo = tpe.suggest, max_eval = 300, plot = False, as_dict = False):
     r"""hyperopt method for the "Indirect dirichlet with histogram" model
-
     The main idea of this function is to return the appropriate hyperopt fmin solver for the "Indirect dirichlet with histogram" model.
-
     Parameters
     ----------
     lbd : float64
@@ -222,11 +212,9 @@ def hyperopt_hist(lbd = 1, ubd = 101, algo = tpe.suggest, max_eval = 300, plot =
         result = [[best_loss],best_alpha]
         return result
 
-def hyperopt_dir(lbd = 1, ubd = 101, algo = tpe.suggest, max_eval = 300, plot = False, as_dict = True):
+def hyperopt_dir(lbd = 1, ubd = 101, algo = tpe.suggest, max_eval = 300, plot = False, as_dict = False):
     r"""hyperopt method for the "direct dirichlet with randomization" model
-
     The main idea of this function is to return the appropriate hyperopt fmin solver for the "direct dirichlet with randomization" model.
-
     Parameters
     ----------
     lbd : float64
@@ -266,9 +254,7 @@ def hyperopt_dir(lbd = 1, ubd = 101, algo = tpe.suggest, max_eval = 300, plot = 
 
 def wasserstein_dist_diff_samples(params):
     r"""hyperopt objective function for the "Indirect dirichlet with samples" model
-
     The main idea of this function is to return the appropriate hyperopt objective function for the "Indirect dirichlet with samples" model.
-
     Parameters
     ----------
     params : list, float64
@@ -288,7 +274,12 @@ def wasserstein_dist_diff_samples(params):
     x2 = np.ones((ts,)) / ts
     x3 = np.ones((source_b_size,)) / source_b_size
     rho_num = partition**d # total number of categorical variables
-    coordinates = np.linspace(-1, 1, partition)        
+    if d == 1:
+        coordinates = np.linspace(-1, 1, partition)        
+    else:
+        grid = np.array([np.linspace(-1, 1, partition)])
+        multi_grid = np.repeat(grid,d,axis=0)
+        coordinates = np.array(np.meshgrid(*multi_grid)).T.reshape(-1, d)  
     dir_probability = dirichlet.rvs(alpha)
     # unravel the ndarray
     rho_rv = dir_probability.ravel() # discrete probability of each point of the grid
@@ -304,9 +295,7 @@ def wasserstein_dist_diff_samples(params):
 
 def wasserstein_dist_diff_hist(params):
     r"""hyperopt objective function for the "Indirect dirichlet with histogram" model
-
     The main idea of this function is to return the appropriate hyperopt objective function for the "Indirect dirichlet with histogram" model.
-
     Parameters
     ----------
     params : list, float64
@@ -333,9 +322,7 @@ def wasserstein_dist_diff_hist(params):
 
 def wasserstein_dist_diff_dir(params):
     r"""hyperopt objective function for the "Direct dirichlet with Randomization" model
-
     The main idea of this function is to return the appropriate hyperopt objective function for the "Direct dirichlet with Randomization" model.
-
     Parameters
     ----------
     params : list, float64
@@ -367,11 +354,24 @@ def wasserstein_dist_diff_dir(params):
     return {'loss': diff, 'status': STATUS_OK,'my_param': rho_choice}
 
 
-def get_opt_rho(opt_alpha, ts):
+def get_opt_rho_1D(opt_alpha, ts):
     p = len(opt_alpha)
     dir_probability = dirichlet.rvs(opt_alpha)
     rho_rv = dir_probability.ravel()
     rho_samples = []
     for i in range(ts):
         rho_samples.append(np.random.choice(np.linspace(-1, 1, p), p=rho_rv))
+    return [rho_rv,rho_samples]
+
+def get_opt_rho_multiD(opt_alpha,d,ts):
+    p = int(len(opt_alpha)**(1/d))
+    dir_probability = dirichlet.rvs(opt_alpha)
+    rho_rv = dir_probability.ravel()
+    rho_index = []
+    X = np.linspace(-1,1,p)
+    Y = np.linspace(-1,1,p)
+    ls = list(product(X,Y))
+    for i in range(ts):
+        rho_index.append(np.random.choice(np.arange(len(ls)), p=rho_rv))
+    rho_samples = [list(ls[i]) for i in rho_index]
     return [rho_rv,rho_samples]
