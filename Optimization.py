@@ -112,7 +112,7 @@ def generate_an_optimal(n = 1000,p = 10, a=gauss(100, m=15, s=5),b = gauss(100, 
             dir_probability = dirichlet.rvs(alpha[i])
             # unravel the ndarray
             rho_rv = dir_probability.ravel()
-            diff = -ot.emd2(a, rho_rv, M2_a)+ ot.emd2(b, rho_rv, M2_b)
+            diff = ot.emd2(a, rho_rv, M2_a)- ot.emd2(b, rho_rv, M2_b)
             result.append(diff)
         mx = np.array(result).min()
         return mx 
@@ -138,7 +138,7 @@ def generate_an_optimal(n = 1000,p = 10, a=gauss(100, m=15, s=5),b = gauss(100, 
             rho = coordinates[R]
             M2_a = cdist(a, rho, lambda u, v: -np.dot(u,v)) # loss matrix        
             M2_b = cdist(b, rho, lambda u, v: -np.dot(u,v)) # loss matrix        
-            diff = -ot.emd2(x1, x2, M2_a)+ ot.emd2(x3,x2, M2_b)
+            diff = ot.emd2(x1, x2, M2_a)- ot.emd2(x3,x2, M2_b)
             result.append(diff)
         myMin = np.array(result).min()
         return myMin
@@ -211,7 +211,7 @@ def generate_an_optimal_samples(a,b,n = 1000,p=10, target_size = 100, lbd = 1, u
         rho = coordinates[R]
         M2_a = cdist(a.reshape(source_a_size,d), rho.reshape(target_size,d),lambda u, v: -np.dot(u,v)) # loss matrix        
         M2_b = cdist(b.reshape(source_b_size,d), rho.reshape(target_size,d),lambda u, v: -np.dot(u,v)) # loss matrix        
-        diff = -ot.emd2(x1, x2, M2_a)+ ot.emd2(x3,x2, M2_b)
+        diff = ot.emd2(x1, x2, M2_a)- ot.emd2(x3,x2, M2_b)
         result.append(diff)
     myMin = np.array(result).min()
     return myMin  
@@ -276,7 +276,7 @@ def generate_an_optimal_dirichlet(a,b,n = 10,target_size = 100, lbd = 1, ubd = 1
             rho_choice = np.array(np.array_split(rho_choice, target_size, axis=0)) # list of target_size sub-arrays of d entries converted to array
         M2_a = cdist(a.reshape(source_a_size,d), rho_choice.reshape(target_size,d),lambda u, v: -np.dot(u,v)) # loss matrix       
         M2_b = cdist(b.reshape(source_b_size,d), rho_choice.reshape(target_size,d),lambda u, v: -np.dot(u,v)) # loss matrix       
-        diff = -ot.emd2(x1, x2, M2_a)+ ot.emd2(x3,x2, M2_b)
+        diff = ot.emd2(x1, x2, M2_a)-ot.emd2(x3,x2, M2_b)
         result.append(diff)
     myMin = np.array(result).min()
     return myMin
@@ -341,7 +341,7 @@ def generate_an_optimal_dirichlet_alternative(a,b,n = 1000,target_size = 100, lb
             rho = np.array(np.array_split(rho, target_size, axis=0))
         M2_a = cdist(a.reshape(source_a_size,d), rho.reshape(target_size,d),lambda u, v: -np.dot(u,v)) # loss matrix        
         M2_b = cdist(b.reshape(source_b_size,d), rho.reshape(target_size,d),lambda u, v: -np.dot(u,v)) # loss matrix        
-        diff = -ot.emd2(x1, x2, M2_a)+ ot.emd2(x3,x2, M2_b)
+        diff = ot.emd2(x1, x2, M2_a)- ot.emd2(x3,x2, M2_b)
         result.append(diff)
     myMin = np.array(result).min()
     return myMin
