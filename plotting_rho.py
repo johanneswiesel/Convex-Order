@@ -238,7 +238,7 @@ def transport_function(b,rho_rv):
 
 # return integrated function of the transport map
 
-def int_function(b,rho_rv):
+def int_function(b, rho_rv, plot = False):
     rho_rv = np.array(rho_rv)
     b_size = len(b)
     rho_rv_size = len(rho_rv)
@@ -267,6 +267,14 @@ def int_function(b,rho_rv):
     y_ls = [y_ls[i] for i in myorder]
         
     f = InterpolatedUnivariateSpline(b, y_ls, k=1)
+    
+    if plot == True:
+        plt.plot(b, y_ls, 'ro', ms=5)
+        xs = np.linspace(b.min(), b.max(), 1000)
+        plt.plot(xs, f(xs), 'g', lw=3)
+        f.set_smoothing_factor(0.5)
+        plt.plot(xs, f(xs), 'b', lw=3)
+        plt.show()
     
     return f
         
