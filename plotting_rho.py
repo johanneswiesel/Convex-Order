@@ -1,14 +1,22 @@
 from bayesian import *
 from Histograms import *
 
+# 1D Packages
 import seaborn as sns
 import bezier
 from scipy.interpolate import InterpolatedUnivariateSpline
 from scipy.interpolate import make_interp_spline
 import statsmodels.api as sm
+# 2D Packages
+from scipy.interpolate import SmoothBivariateSpline
+import matplotlib.pyplot as plt
+import matplotlib.tri as mtri
+from mpl_toolkits.mplot3d import Axes3D
+# 2D integrand
+from scipy.interpolate import NearestNDInterpolator, LinearNDInterpolator
 
 # Authors: Johannes Wiesel, Erica Zhang
-# Version: October 30, 2022
+# Version: February 26, 2023
 
 # DESCRIPTION: This package provides tools to visualize the optimal rho measure obtained via bayesian optimization
 
@@ -102,6 +110,29 @@ def get_curves(source_sample, ts_sample, G0, is_a):
     
     return plt_curve_ls
 
+# getting the optimal rho histogram and the optimal rho random variables 
+# n is the number of rho samples and d is the dimension
+def get_opt_rho_1D(opt_alpha, ts):
+    p = len(opt_alpha)
+    dir_probability = dirichlet.rvs(opt_alpha)
+    rho_rv = dir_probability.ravel()
+    rho_samples = []
+    for i in range(ts):
+        rho_samples.append(np.random.choice(np.linspace(-1, 1, p), p=rho_rv))
+    return [rho_rv,rho_samples]
+
+def get_opt_rho_multiD(opt_alpha,d,ts):
+    p = int(len(opt_alpha)**(1/d))
+    dir_probability = dirichlet.rvs(opt_alpha)
+    rho_rv = dir_probability.ravel()
+    rho_index = []
+    X = np.linspace(-1,1,p)
+    Y = np.linspace(-1,1,p)
+    ls = list(product(X,Y))
+    for i in range(ts):
+        rho_index.append(np.random.choice(np.arange(len(ls)), p=rho_rv))
+    rho_samples = [list(ls[i]) for i in rho_index]
+    return [rho_rv,rho_samples]
 
 
 # input are samples
@@ -282,3 +313,128 @@ def plot_int_function_lowess(b,rho_rv):
 
 
 
+# 2D convex function
+def bivariate_int_function(b,rho_rv):
+    rho_rv = np.array(rho_rv)
+    b_size = len(b)
+    rho_rv_size = len(rho_rv)
+    
+    x2 = np.ones((rho_rv_size,)) / rho_rv_size
+    x3 = np.ones((b_size,)) / b_size
+    
+    Mb = ot.dist(np.array(b).reshape((b_size, 2)), rho_rv.reshape((rho_rv_size, 2)))
+    Gb = ot.emd(x3, x2, Mb) # transport matrix
+    
+    # calculate the average across rho
+    
+    rho_mean = []
+    for i in range(b_size):
+        rho_mean.append(np.dot(Gb[i],rho_rv))
+        
+    rho_mean = np.array(rho_mean)
+        
+    # each element corresponds to one point from sample b
+    z = []
+    for i in range(b_size):
+        z.append(np.dot(b[i],rho_mean[i]))
+        
+    x = b.T[0]
+    y = b.T[1]
+        
+    f = SmoothBivariateSpline(x, y, z, kx=2, ky=2)
+    
+    return f
+
+
+def plot_int_bivariatefFunction_trisurf(b,rho_rv): 
+    x_ls,y_ls = [b.T[0],b.T[1]]
+    f = bivariate_int_function(b,rho_rv)
+    x_lbd = x_ls.min()
+    y_lbd = y_ls.min()
+       
+    res_ls = []
+    for i in range(len(b)):
+        # evaluate integral of the spline over area
+        temp = f.integral(x_lbd,b[i][0],y_lbd,b[i][1])
+        res_ls.append(temp)
+    res_ls = np.array(res_ls)
+    
+    # plot interoploated smooth surface with irregular spaced points
+    triang = mtri.Triangulation(x_ls, y_ls)
+    fig = plt.figure()
+    ax = fig.add_subplot(1,1,1)
+    
+
+    ax.triplot(triang, c="#D3D3D3", marker='.', markerfacecolor="#DC143C", markeredgecolor="black", markersize=10)
+
+    ax.set_xlabel('X')
+    ax.set_ylabel('Y')
+    plt.show()
+    
+    
+    # color map
+    fig = plt.figure(figsize=(12,10))
+    ax = fig.add_subplot(1,1,1, projection='3d')
+    # Creating color map
+    my_cmap = plt.get_cmap('hot')
+
+    trisurf = ax.plot_trisurf(x_ls,y_ls,res_ls,cmap=my_cmap,linewidth = 0.2,antialiased = True,
+                         edgecolor = 'grey')
+    fig.colorbar(trisurf, ax = ax, shrink = 0.5, aspect = 5)
+    ax.scatter(x_ls,y_ls,res_ls, marker='.', s=10, c="black", alpha=0.5)
+    #ax.view_init(elev=60, azim=-45)
+
+    ax.set_xlabel('X')
+    ax.set_ylabel('Y')
+    ax.set_zlabel('Z')
+    plt.show()
+    
+    
+
+# functions for plotting derivatives
+def int_2D_function(b,rho_rv):
+    rho_rv = np.array(rho_rv)
+    b_size = len(b)
+    rho_rv_size = len(rho_rv)
+    
+    x2 = np.ones((rho_rv_size,)) / rho_rv_size
+    x3 = np.ones((b_size,)) / b_size
+    
+    Mb = ot.dist(np.array(b).reshape((b_size, 2)), rho_rv.reshape((rho_rv_size, 2)))
+    Gb = ot.emd(x3, x2, Mb) # transport matrix
+    
+    # calculate the average across rho
+    rho_mean = []
+    for i in range(b_size):
+        temp = [x * rho_rv[i] for x in Gb[i].tolist()]
+        rho_mean.append(sum(temp))
+        
+    rho_mean = np.array(rho_mean)
+        
+    # each element corresponds to one point from sample b
+    ls = []
+    for i in range(b_size):
+        ls.append(np.dot(b[i],rho_mean[i]))
+
+    return b,np.array(ls)
+
+
+def plot_2D_integrad(b, rho_samples, method):
+    b, z = int_2D_function(b,rho_samples)
+    x, y = [b.T[0],b.T[1]]   
+    if method == "Nearest":
+        interp = NearestNDInterpolator(list(zip(x.ravel(), y.ravel())),z)
+    else:
+        interp = LinearNDInterpolator(list(zip(x.ravel(), y.ravel())),z)
+    X = np.linspace(x.ravel().min(), x.ravel().max())
+    Y = np.linspace(y.ravel().min(), y.ravel().max())
+    X, Y = np.meshgrid(X, Y)
+    Z = interp(X,Y)
+    plt.pcolormesh(X, Y, Z, shading='auto')
+    plt.plot(x, y, "ok", label="input point")
+    plt.legend()
+    plt.colorbar()
+    plt.axis("equal")
+    plt.show()
+        
+        
