@@ -309,8 +309,8 @@ def wasserstein_dist_diff_dir(params):
     if d > 1:
         rho_choice = np.array(np.array_split(rho_choice, size, axis=0)) # list of target_size sub-arrays of d entries converted to array
     # 2. apply puccetti
-    diff_mu_rho = swapping_algo(mu,rho,eps)[1]
-    diff_rho_nu = swapping_algo(rho,nu,eps)[1]
+    diff_mu_rho = swapping_algo(mu,rho_choice,eps)[1]
+    diff_rho_nu = swapping_algo(rho_choice,nu,eps)[1]
        
     diff = diff_mu_rho-diff_rho_nu
     return {'loss': diff, 'status': STATUS_OK,'my_param': rho_choice}
